@@ -91,11 +91,5 @@ def check_news():
 
 
 if __name__ == "__main__":
-    print("🚀 BOT TIN TỨC LMHT ĐANG KHỞI CHẠY (CÓ LƯU FILE)...")
-
-    # Chạy lần đầu
+    print("🚀 BOT TIN TỨC LMHT ĐANG KIỂM TRA...")
     check_news()
-
-    while True:
-        time.sleep(600)  # 10 phút
-        check_news()
