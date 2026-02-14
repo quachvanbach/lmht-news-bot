@@ -2,13 +2,15 @@ name: LMHT News Bot Cron
 
 on:
   schedule:
-    # Chạy mỗi 10 phút (Định dạng Cron: Phút Giờ Ngày Tháng Thứ)
-    - cron: '*/10 * * * *'
-  workflow_dispatch: # Cho phép bạn bấm nút chạy thử thủ công
+    - cron: '*/10 * * * *' # Chạy mỗi 10 phút
+  workflow_dispatch:      # Nút bấm chạy thủ công trên GitHub
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Cấp quyền cho Action được phép ghi lại file last-post.txt vào repo
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -21,9 +23,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install requests beautifulsoup4
 
       - name: Run Bot
+        env:
+          # Đây là nơi truyền Secret từ GitHub vào code Python
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python bot_news.py
 
       - name: Commit and push if last-post.txt changed
@@ -31,5 +36,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add last-post.txt
-          # Chỉ commit nếu có sự thay đổi trong file
+          # Kiểm tra nếu file có thay đổi thì mới commit để tránh lỗi khi không có tin mới
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update last post title" && git push)
